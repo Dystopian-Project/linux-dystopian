@@ -1,0 +1,83 @@
+name: Build Kernel
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  release:
+    types: [published]
+  create:
+    branches:
+      - '*'
+
+jobs:
+  check-for-new-release:
+    runs-on: arch-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Git
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+
+      - name: Check for new release
+        run: |
+          git remote add upstream https://github.com/anthraxx/linux-hardened.git
+          git fetch upstream
+          UPSTREAM_VERSION=$(git ls-remote --tags upstream | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
+          LOCAL_VERSION=$(git ls-remote --tags origin | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
+          if [ "$UPSTREAM_VERSION" != "$LOCAL_VERSION" ]; then
+            echo "::set-output name=new_version::$UPSTREAM_VERSION"
+          fi
+
+      - name: Trigger build
+        if: steps.check-for-new-release.outputs.new_version
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build_kernel.yml',
+              ref: 'main',
+              inputs: {
+                version: steps.check-for-new-release.outputs.new_version
+              }
+            })
+
+  build:
+    runs-on: arch-latest
+    needs: check-for-new-release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Build Environment
+        run: |
+          sudo pacman -Syu --noconfirm
+          sudo pacman -S --noconfirm base-devel linux-headers
+
+      - name: Fetch Kernel Source
+        run: |
+          git remote add upstream https://github.com/anthraxx/linux-hardened.git
+          git fetch upstream
+          git checkout ${{ needs.check-for-new-release.outputs.new_version }}
+
+      - name: Build Kernel
+        run: |
+          make defconfig
+          make -j$(nproc)
+
+      - name: Archive Kernel
+        uses: actions/upload-artifact@v2
+        with:
+          name: kernel
+          path: |
+            arch/x86_64/boot/bzImage
+            System.map
+            .config
