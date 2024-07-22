@@ -73,3 +73,11 @@ jobs:
           make defconfig
           make -j$(nproc)
 
+      - name: Archive Kernel
+        uses: actions/upload-artifact@v2
+        with:
+          name: kernel
+          path: |
+            arch/x86_64/boot/bzImage
+            System.map
+            .config
