@@ -16,6 +16,7 @@ on:
 jobs:
   check-for-new-release:
     runs-on: ubuntu-latest
+    name: check
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -58,6 +59,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    if: check.steps.check_release.outputs.new_version
     needs: check-for-new-release
     steps:
       - name: Checkout repository
