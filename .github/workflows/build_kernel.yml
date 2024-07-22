@@ -1,4 +1,4 @@
-name: Pull & Build Dystopian Kernel
+name: Search Updates for Dystopian Kernel
 
 on:
   schedule:
