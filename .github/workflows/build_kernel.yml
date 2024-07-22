@@ -56,7 +56,7 @@ jobs:
               }
             })
 
-  build:
+  release:
     runs-on: ubuntu-latest
     if: needs.check-for-new-release.outputs.new_version
     needs: check-for-new-release
