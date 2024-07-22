@@ -2,12 +2,12 @@ name: Pull from Upstream
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '0 */3 * * *'  # Every 3 hours
   workflow_dispatch:      # Allows manual triggering of the workflow
 
 jobs:
   pull:
-    runs-on: ubuntu-latest
+    runs-on: arch-latest
 
     steps:
     - name: Checkout the repository
