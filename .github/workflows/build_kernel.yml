@@ -22,8 +22,8 @@ jobs:
 
       - name: Setup Git
         run: |
-          git config --global user.email "you@example.com"
-          git config --global user.name "Your Name"
+          git config --global user.email "l0ngd43n@gmail.com"
+          git config --global user.name "DCx7C5"
           git config --global credential.helper store
           echo "https://${{ secrets.GH_TOKEN }}:@github.com" > ~/.git-credentials
 
