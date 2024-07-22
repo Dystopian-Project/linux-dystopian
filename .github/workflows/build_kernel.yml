@@ -15,7 +15,7 @@ on:
 
 jobs:
   check-for-new-release:
-    runs-on: arch-latest
+    runs-on: [self-hosted, arch-latest, x64, gpu]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
             })
 
   build:
-    runs-on: arch-latest
+    runs-on: [self-hosted, arch-latest, x64, gpu]
     needs: check-for-new-release
     steps:
       - name: Checkout repository
