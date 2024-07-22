@@ -1,4 +1,4 @@
-name: Build Dystopian Kernel
+name: Pull & Build Dystopian Kernel
 
 on:
   schedule:
