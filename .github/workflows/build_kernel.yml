@@ -59,7 +59,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    if: check.steps.check_release.outputs.new_version
+    if: check-for-new-release.steps.check_release.outputs.new_version
     needs: check-for-new-release
     steps:
       - name: Checkout repository
