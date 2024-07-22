@@ -15,7 +15,7 @@ on:
 
 jobs:
   check-for-new-release:
-    runs-on: [self-hosted, linux, x64, gpu, ubuntu-latest]
+    runs-on: [self-hosted, linux, x64, gpu]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -56,7 +56,7 @@ jobs:
             })
 
   build:
-    runs-on: [self-hosted, linux, x64, gpu, ubuntu-latest]
+    runs-on: [self-hosted, linux, x64, gpu]
     needs: check-for-new-release
     steps:
       - name: Checkout repository
