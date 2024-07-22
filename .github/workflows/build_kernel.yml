@@ -1,8 +1,8 @@
-name: Build Dystopian Kernel
+name: Build Kernel
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '0 */3 * * *'  # Every 3 hours
   push:
     branches:
       - main
@@ -15,7 +15,7 @@ on:
 
 jobs:
   check-for-new-release:
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64, gpu, ubuntu-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -24,19 +24,24 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+          git config --global credential.helper store
+          echo "https://${{ secrets.GH_TOKEN }}:@github.com" > ~/.git-credentials
 
       - name: Check for new release
+        id: check_release
         run: |
           git remote add upstream https://github.com/anthraxx/linux-hardened.git
           git fetch upstream
           UPSTREAM_VERSION=$(git ls-remote --tags upstream | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
           LOCAL_VERSION=$(git ls-remote --tags origin | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
+          echo "UPSTREAM_VERSION=$UPSTREAM_VERSION" >> $GITHUB_ENV
+          echo "LOCAL_VERSION=$LOCAL_VERSION" >> $GITHUB_ENV
           if [ "$UPSTREAM_VERSION" != "$LOCAL_VERSION" ]; then
             echo "::set-output name=new_version::$UPSTREAM_VERSION"
           fi
 
       - name: Trigger build
-        if: steps.check-for-new-release.outputs.new_version
+        if: steps.check_release.outputs.new_version
         uses: actions/github-script@v4
         with:
           script: |
@@ -46,12 +51,12 @@ jobs:
               workflow_id: 'build_kernel.yml',
               ref: 'main',
               inputs: {
-                version: steps.check-for-new-release.outputs.new_version
+                version: steps.check_release.outputs.new_version
               }
             })
 
   build:
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64, gpu, ubuntu-latest]
     needs: check-for-new-release
     steps:
       - name: Checkout repository
@@ -59,8 +64,13 @@ jobs:
 
       - name: Setup Build Environment
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential bc kmod cpio flex bison libncurses5-dev libelf-dev libssl-dev
+          if [[ "$(uname -s)" == "Linux" && -x "$(command -v pacman)" ]]; then
+            sudo pacman -Syu --noconfirm
+            sudo pacman -S --noconfirm base-devel linux-headers
+          else
+            sudo apt-get update
+            sudo apt-get install -y build-essential bc kmod cpio flex bison libncurses5-dev libelf-dev libssl-dev
+          fi
 
       - name: Fetch Kernel Source
         run: |
