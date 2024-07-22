@@ -1,4 +1,4 @@
-name: Build Kernel
+name: Build Dystopian Kernel
 
 on:
   schedule:
@@ -16,7 +16,6 @@ on:
 jobs:
   check-for-new-release:
     runs-on: ubuntu-latest
-    name: check
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
