@@ -74,7 +74,7 @@ jobs:
 
       - name: Fetch Kernel Source
         run: |
-          git remote add upstream https://github.com/anthraxx/linux-hardened.git
+          git config remote.upstream.url >&- || git remote add upstream https://github.com/anthraxx/linux-hardened.git
           git fetch upstream
           git checkout ${{ needs.check-for-new-release.outputs.new_version }}
 
