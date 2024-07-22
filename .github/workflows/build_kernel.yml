@@ -15,7 +15,7 @@ on:
 
 jobs:
   check-for-new-release:
-    runs-on: [self-hosted, "${{ inputs.chosen-os }}"]
+    runs-on: [self-hosted, arch-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
             })
 
   build:
-    runs-on: [self-hosted, "${{ inputs.chosen-os }}"]
+    runs-on: [self-hosted, arch-latest]
     needs: check-for-new-release
     steps:
       - name: Checkout repository
