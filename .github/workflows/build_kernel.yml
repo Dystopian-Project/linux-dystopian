@@ -25,7 +25,7 @@ jobs:
           git config --global user.email "l0ngd43n@gmail.com"
           git config --global user.name "DCx7C5"
           git config --global credential.helper store
-          echo "https://${{ secrets.GH_TOKEN }}:@github.com" > ~/.git-credentials
+          echo "https://${{ github.token }}:@github.com" > ~/.git-credentials
 
       - name: Check for new release
         id: check_release
@@ -65,6 +65,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Build Environment
+        uses: ./.github/actions/archlinux
         run: |
           if [[ "$(uname -s)" == "Linux" && -x "$(command -v pacman)" ]]; then
             sudo pacman -Syu --noconfirm
@@ -75,12 +76,14 @@ jobs:
           fi
 
       - name: Fetch Kernel Source
+        uses: ./.github/actions/archlinux
         run: |
           git config remote.upstream.url >&- || git remote add upstream https://github.com/anthraxx/linux-hardened.git
           git fetch upstream
           git checkout ${{ needs.check-for-new-release.outputs.new_version }}
 
       - name: Build Kernel
+        uses: ./.github/actions/archlinux
         run: |
           make defconfig
           make -j$(nproc)
