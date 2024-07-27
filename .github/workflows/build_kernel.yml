@@ -66,27 +66,30 @@ jobs:
 
       - name: Setup Build Environment
         uses: ./.github/actions/archlinux
-        run: |
-          if [[ "$(uname -s)" == "Linux" && -x "$(command -v pacman)" ]]; then
-            sudo pacman -Syu --noconfirm
-            sudo pacman -S --noconfirm base-devel linux-hardened-headers
-          else
-            sudo apt-get update
-            sudo apt-get install -y build-essential bc kmod cpio flex bison libncurses5-dev libelf-dev libssl-dev
-          fi
+        with:
+          run: |
+            if [[ "$(uname -s)" == "Linux" && -x "$(command -v pacman)" ]]; then
+              sudo pacman -Syu --noconfirm
+              sudo pacman -S --noconfirm base-devel linux-hardened-headers
+            else
+              sudo apt-get update
+              sudo apt-get install -y build-essential bc kmod cpio flex bison libncurses5-dev libelf-dev libssl-dev
+            fi
 
       - name: Fetch Kernel Source
         uses: ./.github/actions/archlinux
-        run: |
-          git config remote.upstream.url >&- || git remote add upstream https://github.com/anthraxx/linux-hardened.git
-          git fetch upstream
-          git checkout ${{ needs.check-for-new-release.outputs.new_version }}
+        with:
+          run: |
+            git config remote.upstream.url >&- || git remote add upstream https://github.com/anthraxx/linux-hardened.git
+            git fetch upstream
+            git checkout ${{ needs.check-for-new-release.outputs.new_version }}
 
       - name: Build Kernel
         uses: ./.github/actions/archlinux
-        run: |
-          make defconfig
-          make -j$(nproc)
+        with:
+          run: |
+            make defconfig
+            make -j$(nproc)
 
       - name: Archive Kernel
         uses: actions/upload-artifact@v4
