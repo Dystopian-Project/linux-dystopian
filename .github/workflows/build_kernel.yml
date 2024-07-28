@@ -37,7 +37,7 @@ jobs:
           echo "LOCAL_VERSION=$LOCAL_VERSION" >> $GITHUB_ENV
           if [ "$UPSTREAM_VERSION" != "$LOCAL_VERSION" ]; then
             #echo "::set-output name=new_version::$UPSTREAM_VERSION"
-            echo "{name}={value}" >> $GITHUB_OUTPUT
+            echo "new_version=$UPSTREAM_VERSION" >> $GITHUB_OUTPUT
           fi
 
       - name: Trigger build
