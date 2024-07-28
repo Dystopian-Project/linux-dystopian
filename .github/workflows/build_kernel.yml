@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.check_release.outputs.new_version }}
+      local_version: ${{ steps.check_release.outputs.new_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -51,7 +52,7 @@ jobs:
 
       - name: Trigger build
         if: steps.check_release.outputs.new_version
-        uses: actions/github-script@v5
+        uses: actions/github-script@v4
         with:
           script: |
             github.rest.actions.createWorkflowDispatch({
