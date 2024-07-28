@@ -22,6 +22,8 @@ permissions:
 jobs:
   check-for-new-release:
     runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.check_release.outputs.new_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,6 +37,7 @@ jobs:
 
       - name: Check for new release
         id: check_release
+
         run: |
           git config remote.upstream.url >&- || git remote add upstream https://github.com/anthraxx/linux-hardened.git
           UPSTREAM_VERSION=$(git ls-remote --tags upstream | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
@@ -43,7 +46,7 @@ jobs:
           echo "LOCAL_VERSION=$LOCAL_VERSION" >> $GITHUB_ENV
           if [ "$UPSTREAM_VERSION" != "$LOCAL_VERSION" ]; then
             #echo "::set-output name=new_version::$UPSTREAM_VERSION"
-            echo "new_version=$(echo $UPSTREAM_VERSION)" >> $GITHUB_OUTPUT
+            echo "new_version=$UPSTREAM_VERSION" >> $GITHUB_OUTPUT
           fi
 
       - name: Trigger build
