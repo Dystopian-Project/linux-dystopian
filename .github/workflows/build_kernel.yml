@@ -12,6 +12,12 @@ on:
   create:
     branches:
       - '*'
+permissions:
+  packages: write
+  contents: write
+  actions: write
+  deployments: write
+  pull-requests: write
 
 jobs:
   check-for-new-release:
