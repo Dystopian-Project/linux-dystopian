@@ -42,12 +42,12 @@ jobs:
           echo "UPSTREAM_VERSION=$UPSTREAM_VERSION" >> $GITHUB_ENV
           echo "LOCAL_VERSION=$LOCAL_VERSION" >> $GITHUB_ENV
           if [ "$UPSTREAM_VERSION" != "$LOCAL_VERSION" ]; then
-            echo "::set-output name=new_version::$UPSTREAM_VERSION"
-            echo "new_version=${UPSTREAM_VERSION}" >> $GITHUB_OUTPUT
+            #echo "::set-output name=new_version::$UPSTREAM_VERSION"
+            echo "new_version=$(echo $UPSTREAM_VERSION)" >> $GITHUB_OUTPUT
           fi
 
       - name: Trigger build
-        if: needs.check_release.outputs.new_version
+        if: steps.check_release.outputs.new_version
         uses: actions/github-script@v5
         with:
           script: |
