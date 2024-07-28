@@ -42,7 +42,7 @@ jobs:
 
       - name: Trigger build
         if: steps.check_release.outputs.new_version
-        uses: actions/github-script@v4
+        uses: actions/github-script@v5
         with:
           script: |
             github.rest.actions.createWorkflowDispatch({
